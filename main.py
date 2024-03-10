@@ -2,6 +2,8 @@ from fastapi import FastAPI
 
 app = FastAPI()
 
+# Start server: uvicorn main:app --reload
+
 
 @app.get("/")
 async def root():
