@@ -55,9 +55,16 @@ async def user(id: int):
     return search_user(id)
 
 
-@app.get("/user/")  # Query
+@app.get("/user")  # Query
 async def user(id: int):
     return search_user(id)
+
+
+@app.post("/user")
+async def user(user: User):
+    if type(search_user(user.id)) == User:
+        return {"error": "User already exists"}
+    users_list.append(user)
 
 
 def search_user(id: int):
