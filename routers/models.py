@@ -9,7 +9,7 @@ class ModelName(str, Enum):
     lenet = "lenet"
 
 
-router = APIRouter()
+router = APIRouter(tags=["models"])
 
 
 @router.get("/model/{model_name}")
