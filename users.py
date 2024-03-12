@@ -45,22 +45,22 @@ async def get_users():
     ]
 
 
-@app.get("/users")
+@app.get("/users", response_model=list[User])
 async def users():
     return users_list
 
 
-@app.get("/user/{id}")  # Path
+@app.get("/user/{id}", response_model=User)  # Path
 async def user(id: int):
     return search_user(id)
 
 
-@app.get("/user")  # Query
+@app.get("/user", response_model=User)  # Query
 async def user(id: int):
     return search_user(id)
 
 
-@app.post("/user", status_code=201)
+@app.post("/user", response_model=User, status_code=201)
 async def user(user: User):
     if type(search_user(user.id)) == User:
         raise HTTPException(
@@ -71,7 +71,7 @@ async def user(user: User):
     return user
 
 
-@app.put("/user")
+@app.put("/user", response_model=User)
 async def user(user: User):
 
     for index, saved_user in enumerate(users_list):
@@ -87,7 +87,7 @@ async def delete_user(id: int):
     for index, saved_user in enumerate(users_list):
         if saved_user.id == id:
             del users_list[index]
-            return {"message": f"User with id: {id} has been successfully deleted."}
+            return {"detail": f"User with id: {id} has been successfully deleted."}
 
     raise HTTPException(status_code=404, detail=f"User with id: {id} not found.")
 
