@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta, timezone
 
-from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
 from passlib.context import CryptContext
@@ -11,7 +11,7 @@ SECRET_KEY = "16671074f6684e65a0887bc29e6464b893d069a1ae87eb2ac7909f5026d83909"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 2
 
-app = FastAPI()
+router = APIRouter()
 oauth2 = OAuth2PasswordBearer(tokenUrl="login")
 crypt = CryptContext(schemes=["bcrypt"])
 
@@ -88,7 +88,7 @@ async def current_user(user: User = Depends(auth_user)):
     return user
 
 
-@app.post("/login", response_model=Token)
+@router.post("/login", response_model=Token)
 async def login(form: OAuth2PasswordRequestForm = Depends()):
     user_db = users_db.get(form.username)
     if not user_db:
@@ -111,6 +111,6 @@ async def login(form: OAuth2PasswordRequestForm = Depends()):
     }
 
 
-@app.get("/users/me", response_model=User)
+@router.get("/users/me", response_model=User)
 async def me(user: User = Depends(current_user)):
     return user
