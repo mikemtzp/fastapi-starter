@@ -28,14 +28,14 @@ users_db = {
         "full_name": "Mike Martinez",
         "email": "mike@dev.com",
         "disabled": False,
-        "password": "123456",
+        "password": "redrum",
     },
     "spencer": {
         "username": "spencer",
         "full_name": "Spencer Charnas",
         "email": "spencer@i9k.com",
         "disabled": True,
-        "password": "98765",
+        "password": "wurstvacation",
     },
 }
 
