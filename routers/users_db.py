@@ -62,16 +62,12 @@ async def user(user: User):
     raise HTTPException(status_code=404, detail=f"User with id: {user.id} not found.")
 
 
-@router.delete("/userdb/{id}")
-async def delete_user(id: int):
-    for index, saved_user in enumerate(users_list):
-        if saved_user.id == id:
-            del users_list[index]
-            return {"detail": f"User with id: {id} has been successfully deleted."}
+@router.delete("/userdb/{id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_user(id: str):
+    found = users_db.find_one_and_delete({"_id": ObjectId(id)})
 
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND, detail=f"User with id: {id} not found."
-    )
+    if not found:
+        return {"error": "Could not delete user"}
 
 
 def search_user(field: str, value):
