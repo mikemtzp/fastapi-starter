@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
-from routers import basic_auth_users, jwt_auth_user, models, products, users
+from routers import basic_auth_users, jwt_auth_user, models, products, users, users_db
 
 app = FastAPI()
 
@@ -13,6 +13,7 @@ app.include_router(products.router)
 app.include_router(users.router)
 app.include_router(basic_auth_users.router)
 app.include_router(jwt_auth_user.router)
+app.include_router(users_db .router)
 
 # Access image at: http://127.0.0.1:8000/snow/images/gothic-snowflake.jpeg
 app.mount("/snow", StaticFiles(directory="static"), name="snow")
