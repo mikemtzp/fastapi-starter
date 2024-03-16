@@ -13,8 +13,6 @@ router = APIRouter(
 
 users_db = db_client.local.users
 
-users_list = []
-
 
 @router.get("/usersdb", response_model=list[User])
 async def users():
@@ -53,13 +51,15 @@ async def user(user: User):
 
 @router.put("/userdb", response_model=User)
 async def user(user: User):
+    user_dict = dict(user)
+    del user_dict["id"]
 
-    for index, saved_user in enumerate(users_list):
-        if saved_user.id == user.id:
-            users_list[index] = user
-            return user
+    try:
+        users_db.find_one_and_replace({"_id": ObjectId(user.id)}, user_dict)
+    except:
+        return {"error": "Could not update user."}
 
-    raise HTTPException(status_code=404, detail=f"User with id: {user.id} not found.")
+    return search_user("_id", ObjectId(user.id))
 
 
 @router.delete("/userdb/{id}", status_code=status.HTTP_204_NO_CONTENT)
