@@ -1,7 +1,8 @@
 from fastapi import APIRouter, HTTPException, status
 
-from db.models.user import User
 from db.client import db_client
+from db.models.user import User
+from db.schemas.user import user_schema, users_schema
 
 router = APIRouter(
     tags=["usersdb"],
@@ -9,12 +10,16 @@ router = APIRouter(
 )
 
 
+users_db = db_client.local.users
+
 users_list = []
 
 
 @router.get("/usersdb", response_model=list[User])
 async def users():
-    return users_list
+    user = users_db.find()
+    print(user)
+    return users_schema(users_db.find())
 
 
 @router.get("/userdb/{id}", response_model=User)
@@ -29,14 +34,20 @@ async def user(id: int):
 
 @router.post("/userdb", response_model=User, status_code=status.HTTP_201_CREATED)
 async def user(user: User):
-    # if type(search_user(user.id)) == User:
-    #     raise HTTPException(
-    #         status_code=status.HTTP_409_CONFLICT,
-    #         detail=f"User with id: {user.id} already exists",
-    #     )
+    if type(search_user_by_email(user.email)) == User:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=f"User with email: {user.email} already exists",
+        )
 
-    db_client.local
-    return user
+    user_dict = dict(user)
+    del user_dict["id"]
+
+    id = users_db.insert_one(user_dict).inserted_id
+
+    new_user = user_schema(users_db.find_one({"_id": id}))
+
+    return User(**new_user)
 
 
 @router.put("/userdb", response_model=User)
@@ -62,12 +73,17 @@ async def delete_user(id: int):
     )
 
 
-def search_user(id: int):
-    users = filter(lambda user: user.id == id, users_list)
+def search_user_by_email(email: str):
     try:
-        return list(users)[0]
+        user = users_db.find_one({"email": email})
+        return User(**user_schema(user))
     except:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"User with id: {id} not found.",
-        )
+        return {"error": "User not found."}
+
+
+def search_user(email: str):
+    try:
+        user = users_db.find_one({"email": email})
+        return User(**user_schema(user))
+    except:
+        return {"error": "User not found."}
