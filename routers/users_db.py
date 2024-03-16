@@ -1,3 +1,4 @@
+from bson import ObjectId
 from fastapi import APIRouter, HTTPException, status
 
 from db.client import db_client
@@ -23,18 +24,18 @@ async def users():
 
 
 @router.get("/userdb/{id}", response_model=User)
-async def user(id: int):
-    return search_user(id)
+async def user(id: str):
+    return search_user("_id", ObjectId(id))
 
 
 @router.get("/userdb", response_model=User)
-async def user(id: int):
-    return search_user(id)
+async def user(id: str):
+    return search_user("_id", ObjectId(id))
 
 
 @router.post("/userdb", response_model=User, status_code=status.HTTP_201_CREATED)
 async def user(user: User):
-    if type(search_user_by_email(user.email)) == User:
+    if type(search_user("email", user.email)) == User:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail=f"User with email: {user.email} already exists",
@@ -73,17 +74,9 @@ async def delete_user(id: int):
     )
 
 
-def search_user_by_email(email: str):
+def search_user(field: str, value):
     try:
-        user = users_db.find_one({"email": email})
-        return User(**user_schema(user))
-    except:
-        return {"error": "User not found."}
-
-
-def search_user(email: str):
-    try:
-        user = users_db.find_one({"email": email})
+        user = users_db.find_one({field: value})
         return User(**user_schema(user))
     except:
         return {"error": "User not found."}
