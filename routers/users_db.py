@@ -11,7 +11,7 @@ router = APIRouter(
 )
 
 
-users_db = db_client.local.users
+users_db = db_client.users
 
 
 @router.get("/usersdb", response_model=list[User])
