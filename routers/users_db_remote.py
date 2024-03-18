@@ -10,14 +10,13 @@ router = APIRouter(
     responses={status.HTTP_404_NOT_FOUND: {"message": "User not found"}},
 )
 
-
-users_db = client.users
+# Assigment: client.<database>.<collection>
+users_db = client.test.users
 
 
 @router.get("/usersdb", response_model=list[User])
 async def users():
-    user = users_db.find()
-    return users_schema(user)
+    return users_schema(users_db.find())
 
 
 @router.get("/userdb/{id}", response_model=User)
