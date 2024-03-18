@@ -1,8 +1,8 @@
 from bson import ObjectId
 from fastapi import APIRouter, HTTPException, status
 
-from db.client import db_client
 from db.models.user import User
+from db.remote_client import client
 from db.schemas.user import user_schema, users_schema
 
 router = APIRouter(
@@ -11,14 +11,13 @@ router = APIRouter(
 )
 
 
-users_db = db_client.users
+users_db = client.users
 
 
 @router.get("/usersdb", response_model=list[User])
 async def users():
     user = users_db.find()
-    print(user)
-    return users_schema(users_db.find())
+    return users_schema(user)
 
 
 @router.get("/userdb/{id}", response_model=User)
